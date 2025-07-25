@@ -30,5 +30,5 @@ server.on('request', (req, res) => {
 });
 
 io.on("connection", (socket) => {
-  console.log('a user connected')
+  console.log('a user connected', socket.id)
 })
