@@ -29,6 +29,17 @@ server.on('request', (req, res) => {
   }
 });
 
+let readyPlayerCount = 0
+
 io.on("connection", (socket) => {
   console.log('a user connected', socket.id)
+
+  socket.on('ready', () => {
+    console.log("Player ready", socket.id)
+    readyPlayerCount++;
+
+    if (readyPlayerCount === 2) {
+      //broadcast start game event
+    }
+  })
 })
