@@ -37,7 +37,7 @@ io.on("connection", (socket) => {
   socket.on('ready', () => {
     console.log("Player ready", socket.id)
     readyPlayerCount++;
-
+    console.log(readyPlayerCount)
     if (readyPlayerCount === 2) {
       io.emit('startGame', socket.id)
     }

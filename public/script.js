@@ -14,6 +14,7 @@ let paddleDiff = 25;
 let paddleX = [225, 225];
 let trajectoryX = [0, 0];
 let playerMoved = false;
+let isReferee = false;
 
 // Ball
 let ballX = 250;
@@ -160,13 +161,14 @@ function animate() {
   window.requestAnimationFrame(animate);
 }
 
-// Start Game, Reset Everything
-function startGame() {
+function loadGame() {
   createCanvas();
   renderIntro();
   socket.emit('ready')
+}
 
-  paddleIndex = 0;
+function startGame() {
+  paddleIndex = isReferee ? 0 : 1;
   window.requestAnimationFrame(animate);
   canvas.addEventListener('mousemove', (e) => {
     playerMoved = true;
@@ -183,8 +185,16 @@ function startGame() {
 }
 
 // On Load
-startGame();
+loadGame();
 
-socket.on('connect',() => {
+socket.on('connect', () => {
   console.log(socket.id)
+})
+
+socket.on('startGame', (refereeId) => {
+  console.log('refereeId', refereeId)
+  console.log(isReferee)
+  isReferee = socket.id === refereeId
+
+  startGame()
 })
