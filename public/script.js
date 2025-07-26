@@ -179,25 +179,31 @@ function loadGame() {
   socket.emit('ready')
 }
 
+let gameStarted = false; // Track if game has started
+
 function startGame() {
   paddleIndex = isReferee ? 0 : 1;
+  gameStarted = true;
   window.requestAnimationFrame(animate);
-  canvas.addEventListener('mousemove', (e) => {
-    playerMoved = true;
-    paddleX[paddleIndex] = e.offsetX;
-    if (paddleX[paddleIndex] < 0) {
-      paddleX[paddleIndex] = 0;
-    }
-    if (paddleX[paddleIndex] > (width - paddleWidth)) {
-      paddleX[paddleIndex] = width - paddleWidth;
-    }
-    socket.emit('paddleMove', {
-      xPosition: paddleX[paddleIndex]
-    })
-    // Hide Cursor
-    canvas.style.cursor = 'none';
-  });
+  canvas.addEventListener('mousemove', handleMouseMove);
 }
+
+const handleMouseMove = (e) => {
+  if (!gameStarted) return; // Only allow movement after game starts
+  playerMoved = true;
+  paddleX[paddleIndex] = e.offsetX;
+  if (paddleX[paddleIndex] < 0) {
+    paddleX[paddleIndex] = 0;
+  }
+  if (paddleX[paddleIndex] > (width - paddleWidth)) {
+    paddleX[paddleIndex] = width - paddleWidth;
+  }
+  socket.emit('paddleMove', {
+    xPosition: paddleX[paddleIndex]
+  })
+  // Hide Cursor
+  canvas.style.cursor = 'none';
+};
 
 // On Load
 loadGame();
@@ -222,3 +228,14 @@ socket.on('paddleMove', (paddleData) => {
 socket.on('ballMove', (ballData) => {
   ({ ballX, ballY, score } = ballData)
 })
+
+socket.on('opponentDisconnect', () => {
+  // Show message and reset game
+  alert('Opponent disconnected. Game will reset.');
+  window.location.reload();
+});
+
+// Restore cursor on unload or game end
+window.addEventListener('beforeunload', () => {
+  canvas.style.cursor = 'auto';
+});

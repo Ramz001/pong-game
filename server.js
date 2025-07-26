@@ -1,11 +1,11 @@
 const http = require('http')
-const io = require('socket.io')
+const { Server } = require('socket.io')
 
 const apiServer = require('./api')
 const sockets = require('./sockets')
 
 const httpServer = http.createServer(apiServer)
-const socketServer = io(httpServer)
+const socketServer = new Server(httpServer)
 
 const PORT = 3000;
 httpServer.listen(PORT);
